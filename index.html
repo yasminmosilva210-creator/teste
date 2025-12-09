@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuqqzz Scripts Hub</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ FUQQZZ ⚡</h1>
+            <p>Melhor Canal de Scripts</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('about')">📺 Canal</button>
+            <button class="tab-btn" onclick="showTab('scripts')">📜 Scripts</button>
+            <button class="tab-btn" onclick="showTab('executors')">⚙️ Executores</button>
+            <button class="tab-btn" onclick="showTab('key')">🔑 Pegar Key</button>
+        </div>
+
+        <!-- Aba do Canal -->
+        <div id="about" class="tab-content active">
+            <div class="card">
+                <h3>📺 Sobre o Canal</h3>
+                <div id="channelAbout" style="margin-bottom: 30px;">
+                    <p id="aboutText" style="font-size: 1.1em; line-height: 1.6; opacity: 0.9; white-space: pre-line;"></p>
+                    <a id="channelButton" href="https://www.youtube.com/@fuqqzz" target="_blank" class="btn" style="display: inline-block; margin-top: 20px; text-decoration: none;">
+                        ▶️ Inscrever-se no Canal
+                    </a>
+                </div>
+                
+                <h3 style="margin-top: 40px;">🎬 Últimos Vídeos</h3>
+                <div id="videosList" class="grid"></div>
+            </div>
+        </div>
+
+        <!-- Aba de Scripts -->
+        <div id="scripts" class="tab-content">
+            <div class="card">
+                <h3>📜 Scripts Disponíveis</h3>
+                <div id="scriptsList"></div>
+            </div>
+        </div>
+
+        <!-- Aba de Executores -->
+        <div id="executors" class="tab-content">
+            <div class="card">
+                <h3>⚙️ Executores Disponíveis</h3>
+                <div class="grid" id="executorsList"></div>
+            </div>
+        </div>
+
+        <!-- Aba de Key -->
+        <div id="key" class="tab-content">
+            <div class="card">
+                <div class="key-section">
+                    <h3>🔑 Obter Key do Executor</h3>
+                    <p style="margin: 20px 0;">Clique no botão abaixo para obter sua key:</p>
+                    <button class="key-btn" onclick="handleKeyAction()">
+                        Gerar Key
+                    </button>
+                    <p style="margin-top: 20px; color: #dc143c;">⚠️ A key é válida por 24 horas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Developer Panel -->
+    <div class="dev-panel">
+        <button class="dev-toggle" onclick="checkDevAccess()" style="display: none;">🛠️ DEV</button>
+    </div>
+
+    <div class="dev-modal" id="devModal">
+        <div class="dev-content">
+            <div class="close-modal" onclick="closeDevPanel()">✕</div>
+            
+            <!-- Login Screen -->
+            <div id="devLogin">
+                <h2 style="color: #dc143c; margin-bottom: 20px; text-align: center;">🔐 Login de Desenvolvedor</h2>
+                
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="devEmail" placeholder="Digite seu email" onkeypress="if(event.key==='Enter') document.getElementById('devPassword').focus()">
+                </div>
+                
+                <div class="form-group">
+                    <label>Senha:</label>
+                    <input type="password" id="devPassword" placeholder="Digite sua senha" onkeypress="if(event.key==='Enter') loginDev()">
+                </div>
+                
+                <button class="btn" onclick="loginDev()" style="width: 100%;">🔓 Entrar</button>
+                <p style="text-align: center; margin-top: 15px; opacity: 0.6; font-size: 12px;">Área restrita ao administrador</p>
+                <p id="loginError" style="color: #ff4444; text-align: center; margin-top: 10px; display: none;"></p>
+            </div>
+
+            <!-- Dev Panel (hidden by default) -->
+            <div id="devPanel" style="display: none;">
+                <h2 style="color: #dc143c; margin-bottom: 20px;">Painel de Desenvolvedor</h2>
+                
+                <!-- Dev Tabs -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button class="btn" onclick="showDevTab('add')" id="devTabAdd" style="flex: 1; min-width: 100px;">➕ Adicionar</button>
+                    <button class="btn" onclick="showDevTab('videos')" id="devTabVideos" style="flex: 1; min-width: 100px; background: linear-gradient(45deg, #4a0000, #8b0000);">🎬 Vídeos</button>
+                    <button class="btn" onclick="showDevTab('manage')" id="devTabManage" style="flex: 1; min-width: 100px; background: linear-gradient(45deg, #4a0000, #8b0000);">📋 Gerenciar</button>
+                    <button class="btn" onclick="showDevTab('settings')" id="devTabSettings" style="flex: 1; min-width: 100px; background: linear-gradient(45deg, #4a0000, #8b0000);">⚙️ Configurações</button>
+                </div>
+
+                <!-- Tab: Add Post -->
+                <div id="devAddTab" class="dev-tab-content">
+                    <div class="form-group">
+                        <label>Tipo:</label>
+                        <select id="postType">
+                            <option value="script">Script</option>
+                            <option value="executor">Executor</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nome:</label>
+                        <input type="text" id="postName" placeholder="Ex: Universal ESP">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descrição:</label>
+                        <textarea id="postDesc" placeholder="Descrição do script/executor"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Código/Link (para script: código lua, para executor: link de download):</label>
+                        <textarea id="postCode" placeholder="Cole aqui o código ou link"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Link do Vídeo (YouTube):</label>
+                        <input type="text" id="postVideo" placeholder="https://youtube.com/...">
+                    </div>
+
+                    <button class="btn" onclick="addPost()" style="width: 100%;">➕ Adicionar Post</button>
+                </div>
+
+                <!-- Tab: Videos -->
+                <div id="devVideosTab" class="dev-tab-content" style="display: none;">
+                    <div class="form-group">
+                        <label>🎬 Adicionar Vídeo do YouTube:</label>
+                        <input type="text" id="videoUrlInput" placeholder="Cole o link do vídeo do YouTube aqui" onkeypress="if(event.key==='Enter') addVideo()">
+                        <button class="btn" onclick="addVideo()" style="margin-top: 10px; width: 100%;">➕ Adicionar Vídeo</button>
+                        <p style="margin-top: 10px; opacity: 0.7; font-size: 0.9em;">
+                            💡 Dica: Cole o link completo do vídeo do YouTube (ex: https://www.youtube.com/watch?v=...)
+                        </p>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <label style="color: #dc143c; font-weight: bold; display: block; margin-bottom: 15px;">📹 Vídeos Cadastrados (<span id="videoCount">0</span>):</label>
+                        <div id="devVideosList"></div>
+                    </div>
+
+                    <button class="btn btn-delete" onclick="clearAllVideos()" style="width: 100%; margin-top: 20px;">🗑️ Deletar Todos os Vídeos</button>
+                </div>
+
+                <!-- Tab: Manage Posts -->
+                <div id="devManageTab" class="dev-tab-content" style="display: none;">
+                    <div style="margin-bottom: 15px;">
+                        <label style="color: #dc143c; font-weight: bold;">Filtrar por tipo:</label>
+                        <select id="filterType" onchange="renderManagePosts()" style="padding: 8px; border-radius: 5px; background: rgba(0,0,0,0.5); color: white; border: 2px solid rgba(220, 20, 60, 0.5); margin-left: 10px;">
+                            <option value="all">Todos</option>
+                            <option value="script">Scripts</option>
+                            <option value="executor">Executores</option>
+                        </select>
+                        <span style="margin-left: 20px; opacity: 0.8;">Total de posts: <strong id="totalPosts">0</strong></span>
+                    </div>
+                    <div id="managePostsList"></div>
+                    <button class="btn btn-delete" onclick="clearAllPosts()" style="width: 100%; margin-top: 20px;">🗑️ Deletar Todos os Posts</button>
+                </div>
+
+                <!-- Tab: Settings -->
+                <div id="devSettingsTab" class="dev-tab-content" style="display: none;">
+                    <div class="form-group">
+                        <label>🔑 Configuração da Key:</label>
+                        <select id="keyModeSelect" onchange="toggleKeyMode()" style="width: 100%; padding: 10px; border-radius: 5px; background: rgba(0,0,0,0.5); color: white; border: 2px solid rgba(220, 20, 60, 0.5); margin-top: 10px;">
+                            <option value="message">Mostrar Mensagem</option>
+                            <option value="link">Redirecionar para Link</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="keyMessageGroup" style="margin-top: 15px;">
+                        <label>💬 Mensagem Personalizada:</label>
+                        <textarea id="keyMessageInput" placeholder="Ex: Em Breve! Aguarde novidades no canal." style="width: 100%; padding: 10px; border-radius: 5px; background: rgba(0,0,0,0.5); color: white; border: 2px solid rgba(220, 20, 60, 0.5); margin-top: 10px; min-height: 80px;"></textarea>
+                        <button class="btn" onclick="saveKeyMessage()" style="margin-top: 10px; width: 100%;">💾 Salvar Mensagem</button>
+                    </div>
+
+                    <div class="form-group" id="keyLinkGroup" style="margin-top: 15px; display: none;">
+                        <label>🔗 Link do Encurtador de Key:</label>
+                        <input type="text" id="keyLinkInput" placeholder="https://seu-encurtador.com/key" style="width: 100%; padding: 10px; border-radius: 5px; background: rgba(0,0,0,0.5); color: white; border: 2px solid rgba(220, 20, 60, 0.5); margin-top: 10px;">
+                        <button class="btn" onclick="saveKeyLink()" style="margin-top: 10px; width: 100%;">💾 Salvar Link</button>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 30px;">
+                        <label>🔗 Link do Canal (YouTube):</label>
+                        <input type="text" id="channelLinkInput" placeholder="https://www.youtube.com/@fuqqzz">
+                        <button class="btn" onclick="saveChannelLink()" style="margin-top: 10px; width: 100%;">💾 Salvar Link</button>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 30px;">
+                        <label>📝 Sobre o Canal:</label>
+                        <textarea id="aboutTextInput" placeholder="Escreva sobre o seu canal..." style="width: 100%; padding: 10px; border-radius: 5px; background: rgba(0,0,0,0.5); color: white; border: 2px solid rgba(220, 20, 60, 0.5); margin-top: 10px; min-height: 150px;"></textarea>
+                        <button class="btn" onclick="saveAboutText()" style="margin-top: 10px; width: 100%;">💾 Salvar Descrição</button>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 30px;">
+                        <label>📊 Estatísticas:</label>
+                        <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; margin-top: 10px;">
+                            <p>📜 Scripts: <strong id="statsScripts">0</strong></p>
+                            <p style="margin-top: 5px;">⚙️ Executores: <strong id="statsExecutors">0</strong></p>
+                            <p style="margin-top: 5px;">📦 Total: <strong id="statsTotal">0</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 30px;">
+                        <label>💾 Backup & Restore:</label>
+                        <button class="btn" onclick="exportData()" style="width: 100%; margin-top: 10px;">📥 Exportar Dados</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                        <button class="btn" onclick="document.getElementById('importFile').click()" style="width: 100%; margin-top: 10px; background: linear-gradient(45deg, #4a0000, #8b0000);">📤 Importar Dados</button>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="logout()" style="background: #333; margin-top: 20px; width: 100%;">🚪 Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div class="message-modal" id="messageModal">
+        <div class="message-box">
+            <h3>🔑 Key System</h3>
+            <p id="messageText"></p>
+            <button class="message-close" onclick="closeMessage()">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Update Notification -->
+    <div class="update-notification" id="updateNotification" onclick="reloadPage()">
+        <strong>🔄 Nova atualização disponível!</strong><br>
+        <span style="font-size: 0.9em;">Clique aqui para recarregar a página</span>
+    </div>
+
+    <script src="js/index.js"></script>
+</body>
+</html>
